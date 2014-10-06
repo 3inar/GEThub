@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"code.google.com/p/goauth2/oauth"
 	"github.com/google/go-github/github"
@@ -61,7 +62,9 @@ func main() {
 		comms, _, _ := client.Repositories.ListCommits(*fork.Owner.Login,
 			*fork.Name, nil)
 		for _, commit := range comms {
-			messages = append(messages, *commit.Commit.Message)
+			m := *commit.Commit.Message
+			brief := strings.Split(m, "\n")[0]
+			messages = append(messages, brief)
 		}
 	}
 
