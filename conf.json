@@ -1,0 +1,6 @@
+{ 
+    "Token": "your app token",
+    "Org": "Name of organization",
+    "Repo": "Repository name"
+}
+
