@@ -13,18 +13,20 @@ import (
 
 type Config struct {
 	Token string
+	Org   string
+	Repo  string
 }
 
-func getAppToken(filename string) (string, error) {
+func readConfig(filename string) (Config, error) {
 
 	file, err := os.Open(filename)
+	config := Config{}
 
 	if err != nil {
-		return "", errors.New("Cannot find config file!")
+		return config, errors.New("Cannot find config file!")
 	}
 
 	decoder := json.NewDecoder(file)
-	config := Config{}
 
 	err = decoder.Decode(&config)
 
@@ -32,28 +34,27 @@ func getAppToken(filename string) (string, error) {
 		fmt.Println("error:", err)
 	}
 
-	return config.Token, nil
+	return config, nil
 }
 
 func main() {
-	configFile := flag.String("configfile", "conf.json",
+	configFile := flag.String("config", "conf.json",
 		"Configuration file. Where your app token lives")
 
 	flag.Parse()
 
-	token, err := getAppToken(*configFile)
+	config, err := readConfig(*configFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	t := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: token},
+		Token: &oauth.Token{AccessToken: config.Token},
 	}
 
 	client := github.NewClient(t.Client())
-	repos, _, _ := client.Repositories.ListForks("uit-inf-3200", "Project-1",
-		nil)
+	repos, _, _ := client.Repositories.ListForks(config.Org, config.Repo, nil)
 	messages := make([]string, 0)
 
 	for _, fork := range repos {
